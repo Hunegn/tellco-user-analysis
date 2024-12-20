@@ -38,14 +38,96 @@ def top_5_handsets_per_manufacturer(data, top_manufacturers):
         print(f"\nTop 5 Handsets for {manufacturer}:")
         handsets = data[data['Handset Manufacturer'] == manufacturer]['Handset Type'].value_counts().head(5)
         print(handsets)
+
+def aggregate_application_data(data):
+    """
+    Aggregates data for different application categories (e.g., Social Media, Google, etc.).
+    Args:
+        data (pd.DataFrame): The dataset.
+    Returns:
+        pd.DataFrame: Aggregated application data.
+    """
   
-if __name__ == "__main__":
+    application_columns = {
+        'Social Media': ['Social Media DL (Bytes)', 'Social Media UL (Bytes)'],
+        'Google': ['Google DL (Bytes)', 'Google UL (Bytes)'],
+        'Youtube': ['Youtube DL (Bytes)', 'Youtube UL (Bytes)'],
+        'Netflix': ['Netflix DL (Bytes)', 'Netflix UL (Bytes)'],
+        'Gaming': ['Gaming DL (Bytes)', 'Gaming UL (Bytes)'],
+        'Other': ['Other DL (Bytes)', 'Other UL (Bytes)'],
+    }
+
+    aggregated_data = {}
+    for app, cols in application_columns.items():
+        dl_col, ul_col = cols
+        total_dl = data[dl_col].sum()
+        total_ul = data[ul_col].sum()
+        total_data = total_dl + total_ul
+        aggregated_data[app] = {'Total DL (Bytes)': total_dl, 'Total UL (Bytes)': total_ul, 'Total Data Volume': total_data}
+
+    aggregated_df = pd.DataFrame.from_dict(aggregated_data, orient='index')
+    aggregated_df = aggregated_df.sort_values(by='Total Data Volume', ascending=False)
+
+    print("\nAggregated Application Data:")
+    print(aggregated_df)
+    return aggregated_df
+
+
+
+
+def segment_users_by_session_duration(data):
+    """
+    Segments users into deciles based on total session duration.
+    Args:
+        data (pd.DataFrame): The dataset.
+    Returns:
+        pd.DataFrame: Dataset with decile information.
+    """
+  
+    session_duration_col = 'Dur. (ms)' 
+
+    if session_duration_col not in data.columns:
+        print(f"Column '{session_duration_col}' not found in the dataset.")
+        return data
+
+  
+    user_id_col = 'MSISDN/Number'  
+    if user_id_col not in data.columns:
+        print(f"Column '{user_id_col}' not found in the dataset.")
+        return data
+
+   
+    total_duration_per_user = data.groupby(user_id_col)[session_duration_col].sum().reset_index()
+    total_duration_per_user.columns = [user_id_col, 'Total Session Duration']
+
+   
+    total_duration_per_user['Decile'] = pd.qcut(total_duration_per_user['Total Session Duration'], 10, labels=False)
+
+    print("\nUser Decile Segmentation Summary:")
+    decile_summary = total_duration_per_user.groupby('Decile').agg({'Total Session Duration': ['mean', 'sum']})
+    print(decile_summary)
+
+
+    data = data.merge(total_duration_per_user[[user_id_col, 'Decile']], on=user_id_col, how='left')
+    return data
+
+
+def main():
+    
     file_path = '../data/Copy of Week2_challenge_data_source(CSV).csv'
     data = load_data(file_path)
-    #inspect_data(data)
+    inspect_data(data)
     top_10_handsets(data)
-    top_3_manufacturers(data)
     top_manufacturers = top_3_manufacturers(data)
     top_5_handsets_per_manufacturer(data, top_manufacturers)
+    aggregated_app_data = aggregate_application_data(data)
+    data = segment_users_by_session_duration(data)
+   
+
+if __name__ == "__main__":
+    main()
+       
+  
+
     
 
