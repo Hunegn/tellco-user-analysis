@@ -1,5 +1,6 @@
-
 import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 def load_data(file_path):
     data = pd.read_csv(file_path)
@@ -110,7 +111,52 @@ def segment_users_by_session_duration(data):
 
     data = data.merge(total_duration_per_user[[user_id_col, 'Decile']], on=user_id_col, how='left')
     return data
+def univariate_analysis(data, columns):
+    """
+    Performs univariate analysis on specified columns and visualizes distributions.
+    Args:
+        data (pd.DataFrame): The dataset.
+        columns (list): List of columns to analyze.
+    """
+    for col in columns:
+        if col in data.columns:
+            plt.figure(figsize=(10, 6))
+            sns.histplot(data[col], kde=True, bins=30, color='blue')
+            plt.title(f"Distribution of {col}")
+            plt.xlabel(col)
+            plt.ylabel("Frequency")
+            plt.grid(axis='y', linestyle='--', alpha=0.7)
+            plt.show()
+def bivariate_analysis(data, x_col, y_col):
+    """
+    Performs bivariate analysis between two columns using scatter plots and correlation.
+    Args:
+        data (pd.DataFrame): The dataset.
+        x_col (str): Column for the x-axis.
+        y_col (str): Column for the y-axis.
+    """
+    if x_col in data.columns and y_col in data.columns:
+        plt.figure(figsize=(10, 6))
+        sns.scatterplot(x=data[x_col], y=data[y_col], alpha=0.7, color='purple')
+        plt.title(f"{x_col} vs. {y_col}")
+        plt.xlabel(x_col)
+        plt.ylabel(y_col)
+        plt.grid(True, linestyle='--', alpha=0.7)
+        plt.show()
 
+        
+        corr = data[[x_col, y_col]].corr().iloc[0, 1]
+        print(f"Correlation between {x_col} and {y_col}: {corr:.2f}")
+def eda_insights(data):
+    """
+    Summarizes key findings from the dataset.
+    Args:
+        data (pd.DataFrame): The dataset.
+    """
+    print("\nKey Insights:")
+    print(f"Average session duration: {data['Dur. (ms)'].mean():.2f} ms")
+    print(f"Total data volume: {data['Total DL (Bytes)'].sum() + data['Total UL (Bytes)'].sum():.2e} Bytes")
+    print(f"Number of unique users: {data['MSISDN/Number'].nunique()}")
 
 def main():
     
@@ -122,6 +168,11 @@ def main():
     top_5_handsets_per_manufacturer(data, top_manufacturers)
     aggregated_app_data = aggregate_application_data(data)
     data = segment_users_by_session_duration(data)
+    univariate_columns = ['Dur. (ms)', 'Total DL (Bytes)', 'Total UL (Bytes)']
+    univariate_analysis(data, univariate_columns)
+    bivariate_analysis(data, 'Dur. (ms)', 'Total DL (Bytes)')
+    bivariate_analysis(data, 'Total DL (Bytes)', 'Total UL (Bytes)')
+    eda_insights(data)
    
 
 if __name__ == "__main__":
