@@ -147,7 +147,16 @@ def bivariate_analysis(data, x_col, y_col):
         
         corr = data[[x_col, y_col]].corr().iloc[0, 1]
         print(f"Correlation between {x_col} and {y_col}: {corr:.2f}")
-
+def eda_insights(data):
+    """
+    Summarizes key findings from the dataset.
+    Args:
+        data (pd.DataFrame): The dataset.
+    """
+    print("\nKey Insights:")
+    print(f"Average session duration: {data['Dur. (ms)'].mean():.2f} ms")
+    print(f"Total data volume: {data['Total DL (Bytes)'].sum() + data['Total UL (Bytes)'].sum():.2e} Bytes")
+    print(f"Number of unique users: {data['MSISDN/Number'].nunique()}")
 
 def main():
     
@@ -163,6 +172,7 @@ def main():
     univariate_analysis(data, univariate_columns)
     bivariate_analysis(data, 'Dur. (ms)', 'Total DL (Bytes)')
     bivariate_analysis(data, 'Total DL (Bytes)', 'Total UL (Bytes)')
+    eda_insights(data)
    
 
 if __name__ == "__main__":
