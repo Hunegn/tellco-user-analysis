@@ -62,6 +62,30 @@ def cluster_users(user_metrics, n_clusters=4):
     print(kmeans.cluster_centers_)
 
     return user_metrics
+def analyze_clusters(user_metrics):
+    """
+    Analyzes and visualizes the characteristics of each user cluster.
+    Args:
+        user_metrics (pd.DataFrame): User metrics with cluster assignments.
+    """
+    cluster_summary = user_metrics.groupby('Cluster').agg({
+        'Session Count': 'mean',
+        'Avg Session Duration': 'mean',
+        'Total Data Volume': 'mean',
+        'User ID': 'count'
+    }).rename(columns={'User ID': 'User Count'})
+
+    print("\nCluster Summary:")
+    print(cluster_summary)
+
+    
+    cluster_summary[['Session Count', 'Avg Session Duration', 'Total Data Volume']].plot(kind='bar', figsize=(10, 6))
+    plt.title("Cluster Characteristics")
+    plt.xlabel("Cluster")
+    plt.ylabel("Average Value")
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    plt.legend()
+    plt.show()
 
 def main():
     
@@ -72,7 +96,7 @@ def main():
     user_metrics = aggregate_user_engagement(data)
     
     user_metrics = cluster_users(user_metrics)
-    
+    analyze_clusters(user_metrics)
 
    
 
