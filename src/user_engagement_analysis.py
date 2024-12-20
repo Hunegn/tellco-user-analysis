@@ -40,6 +40,28 @@ def aggregate_user_engagement(data):
     print("\nAggregated User Engagement Metrics:")
     print(user_metrics.head())
     return user_metrics
+def cluster_users(user_metrics, n_clusters=4):
+    """
+    Clusters users into engagement groups based on their metrics using K-Means.
+    Args:
+        user_metrics (pd.DataFrame): User engagement metrics.
+        n_clusters (int): Number of clusters.
+    Returns:
+        pd.DataFrame: User metrics with cluster assignments.
+    """
+    features = ['Session Count', 'Avg Session Duration', 'Total Data Volume']
+    X = user_metrics[features]
+
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X)
+
+    kmeans = KMeans(n_clusters=n_clusters, random_state=42)
+    user_metrics['Cluster'] = kmeans.fit_predict(X_scaled)
+
+    print("\nCluster Centers:")
+    print(kmeans.cluster_centers_)
+
+    return user_metrics
 
 def main():
     
@@ -48,6 +70,9 @@ def main():
     
     data = load_data(file_path)
     user_metrics = aggregate_user_engagement(data)
+    
+    user_metrics = cluster_users(user_metrics)
+    
 
    
 
