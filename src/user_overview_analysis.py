@@ -127,6 +127,27 @@ def univariate_analysis(data, columns):
             plt.ylabel("Frequency")
             plt.grid(axis='y', linestyle='--', alpha=0.7)
             plt.show()
+def bivariate_analysis(data, x_col, y_col):
+    """
+    Performs bivariate analysis between two columns using scatter plots and correlation.
+    Args:
+        data (pd.DataFrame): The dataset.
+        x_col (str): Column for the x-axis.
+        y_col (str): Column for the y-axis.
+    """
+    if x_col in data.columns and y_col in data.columns:
+        plt.figure(figsize=(10, 6))
+        sns.scatterplot(x=data[x_col], y=data[y_col], alpha=0.7, color='purple')
+        plt.title(f"{x_col} vs. {y_col}")
+        plt.xlabel(x_col)
+        plt.ylabel(y_col)
+        plt.grid(True, linestyle='--', alpha=0.7)
+        plt.show()
+
+        
+        corr = data[[x_col, y_col]].corr().iloc[0, 1]
+        print(f"Correlation between {x_col} and {y_col}: {corr:.2f}")
+
 
 def main():
     
@@ -140,6 +161,8 @@ def main():
     data = segment_users_by_session_duration(data)
     univariate_columns = ['Dur. (ms)', 'Total DL (Bytes)', 'Total UL (Bytes)']
     univariate_analysis(data, univariate_columns)
+    bivariate_analysis(data, 'Dur. (ms)', 'Total DL (Bytes)')
+    bivariate_analysis(data, 'Total DL (Bytes)', 'Total UL (Bytes)')
    
 
 if __name__ == "__main__":
