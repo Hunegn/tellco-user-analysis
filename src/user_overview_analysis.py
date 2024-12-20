@@ -1,5 +1,6 @@
-
 import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 def load_data(file_path):
     data = pd.read_csv(file_path)
@@ -110,7 +111,22 @@ def segment_users_by_session_duration(data):
 
     data = data.merge(total_duration_per_user[[user_id_col, 'Decile']], on=user_id_col, how='left')
     return data
-
+def univariate_analysis(data, columns):
+    """
+    Performs univariate analysis on specified columns and visualizes distributions.
+    Args:
+        data (pd.DataFrame): The dataset.
+        columns (list): List of columns to analyze.
+    """
+    for col in columns:
+        if col in data.columns:
+            plt.figure(figsize=(10, 6))
+            sns.histplot(data[col], kde=True, bins=30, color='blue')
+            plt.title(f"Distribution of {col}")
+            plt.xlabel(col)
+            plt.ylabel("Frequency")
+            plt.grid(axis='y', linestyle='--', alpha=0.7)
+            plt.show()
 
 def main():
     
@@ -122,6 +138,8 @@ def main():
     top_5_handsets_per_manufacturer(data, top_manufacturers)
     aggregated_app_data = aggregate_application_data(data)
     data = segment_users_by_session_duration(data)
+    univariate_columns = ['Dur. (ms)', 'Total DL (Bytes)', 'Total UL (Bytes)']
+    univariate_analysis(data, univariate_columns)
    
 
 if __name__ == "__main__":
