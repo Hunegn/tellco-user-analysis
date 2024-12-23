@@ -32,12 +32,27 @@ def clean_data(data):
     
     print("\nData cleaned. Remaining rows:", len(data))
     return data
-
+def correlation_analysis(data):
+    """
+    Analyzes correlations between network parameters and user metrics.
+    Args:
+        data (pd.DataFrame): The dataset.
+    """
+    correlation_columns = ['Avg RTT DL (ms)', 'Avg RTT UL (ms)', 'Avg Bearer TP DL (kbps)', 'Avg Bearer TP UL (kbps)',
+                           'Dur. (ms)', 'Total DL (Bytes)', 'Total UL (Bytes)']
+    corr_matrix = data[correlation_columns].corr()
+    
+   
+    plt.figure(figsize=(10, 6))
+    sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', fmt=".2f")
+    plt.title("Correlation Matrix of Network Parameters and User Metrics")
+    plt.show()
 def main():
     file_path = '../data/Copy of Week2_challenge_data_source(CSV).csv'
 
     data = load_data(file_path)
     clean_data(data)
+    correlation_analysis(data)
 
 
 if __name__ == "__main__":
