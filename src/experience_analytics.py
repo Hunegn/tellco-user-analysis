@@ -49,11 +49,25 @@ def aggregate_customer_data(data):
     print(aggregated_data.head())
     return aggregated_data
 
+def analyze_parameters(data):
+    """
+    Computes and lists top, bottom, and most frequent values for TCP, RTT, and Throughput.
+    """
+    parameters = ['Avg TCP Retransmission', 'Avg RTT DL', 'Avg Throughput DL']
+
+    for param in parameters:
+        print(f"\nAnalysis for {param}:")
+        print(f"Top 10:\n{data[param].nlargest(10)}")
+        print(f"Bottom 10:\n{data[param].nsmallest(10)}")
+        print(f"Most Frequent:\n{data[param].mode().values[0]}")
+
+
 def main():
     file_path = '../data/Copy of Week2_challenge_data_source(CSV).csv'
 
     data = load_data(file_path)
     aggregated_data = aggregate_customer_data(data)
+    analyze_parameters(aggregated_data)
 
 
 if __name__ == "__main__":
