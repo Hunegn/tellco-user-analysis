@@ -61,6 +61,23 @@ def analyze_parameters(data):
         print(f"Bottom 10:\n{data[param].nsmallest(10)}")
         print(f"Most Frequent:\n{data[param].mode().values[0]}")
 
+# Task 3.3 - Distributions by Handset Type
+def analyze_distributions(data):
+    """
+    Computes distributions of throughput and TCP retransmissions by handset type.
+    """
+
+    plt.figure(figsize=(10, 6))
+    sns.boxplot(data=data, x='Handset Type', y='Avg Throughput DL')
+    plt.title("Distribution of Avg Throughput DL by Handset Type")
+    plt.xticks(rotation=90)
+    plt.show()
+
+    plt.figure(figsize=(10, 6))
+    sns.boxplot(data=data, x='Handset Type', y='Avg TCP Retransmission')
+    plt.title("Distribution of Avg TCP Retransmission by Handset Type")
+    plt.xticks(rotation=90)
+    plt.show()
 
 def main():
     file_path = '../data/Copy of Week2_challenge_data_source(CSV).csv'
@@ -68,6 +85,7 @@ def main():
     data = load_data(file_path)
     aggregated_data = aggregate_customer_data(data)
     analyze_parameters(aggregated_data)
+    analyze_distributions(aggregated_data)
 
 
 if __name__ == "__main__":
