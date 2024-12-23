@@ -1,6 +1,10 @@
 import pandas as pd
+import numpy as np
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
 import seaborn as sns
 import matplotlib.pyplot as plt
+
 
 def load_data(file_path):
     """
@@ -19,11 +23,11 @@ def aggregate_customer_data(data):
     """
     Aggregates network parameters and handset type per customer.
     """
-   
+    
     numeric_cols = ['TCP DL Retrans. Vol (Bytes)', 'TCP UL Retrans. Vol (Bytes)',
                     'Avg RTT DL (ms)', 'Avg RTT UL (ms)', 'Avg Bearer TP DL (kbps)', 'Avg Bearer TP UL (kbps)']
     for col in numeric_cols:
-        data[col].fillna(data[col].mean(), inplace=True)
+        data[col] = data[col].fillna(data[col].mean())  
 
 
     aggregated_data = data.groupby('MSISDN/Number').agg({
@@ -49,6 +53,7 @@ def aggregate_customer_data(data):
     print(aggregated_data.head())
     return aggregated_data
 
+
 def analyze_parameters(data):
     """
     Computes and lists top, bottom, and most frequent values for TCP, RTT, and Throughput.
@@ -61,7 +66,7 @@ def analyze_parameters(data):
         print(f"Bottom 10:\n{data[param].nsmallest(10)}")
         print(f"Most Frequent:\n{data[param].mode().values[0]}")
 
-# Task 3.3 - Distributions by Handset Type
+
 def analyze_distributions(data):
     """
     Computes distributions of throughput and TCP retransmissions by handset type.
@@ -78,6 +83,31 @@ def analyze_distributions(data):
     plt.title("Distribution of Avg TCP Retransmission by Handset Type")
     plt.xticks(rotation=90)
     plt.show()
+def perform_clustering(data):
+    """
+    Performs K-Means clustering and provides cluster descriptions.
+    """
+  
+    features = ['Avg TCP Retransmission', 'Avg RTT DL', 'Avg Throughput DL']
+    X = data[features]
+
+
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X)
+
+  
+    kmeans = KMeans(n_clusters=3, random_state=42)
+    data['Cluster'] = kmeans.fit_predict(X_scaled)
+
+    
+    numeric_columns = data.select_dtypes(include=[np.number]).columns
+    cluster_summary = data[numeric_columns].groupby('Cluster').mean()
+
+    print("\nCluster Descriptions:")
+    print(cluster_summary)
+
+    return data
+
 
 def main():
     file_path = '../data/Copy of Week2_challenge_data_source(CSV).csv'
@@ -86,7 +116,7 @@ def main():
     aggregated_data = aggregate_customer_data(data)
     analyze_parameters(aggregated_data)
     analyze_distributions(aggregated_data)
-
+    perform_clustering(aggregated_data)
 
 if __name__ == "__main__":
     main()
