@@ -47,12 +47,37 @@ def correlation_analysis(data):
     sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', fmt=".2f")
     plt.title("Correlation Matrix of Network Parameters and User Metrics")
     plt.show()
+def scatter_plots(data):
+    """
+    Creates scatter plots to explore relationships between network parameters and user metrics.
+    Args:
+        data (pd.DataFrame): The dataset.
+    """
+    
+    plt.figure(figsize=(8, 6))
+    sns.scatterplot(data=data, x='Avg RTT DL (ms)', y='Dur. (ms)', alpha=0.6, color='blue')
+    plt.title("RTT (Download) vs. Session Duration")
+    plt.xlabel("Avg RTT DL (ms)")
+    plt.ylabel("Session Duration (ms)")
+    plt.grid(True, linestyle='--', alpha=0.7)
+    plt.show()
+    
+   
+    plt.figure(figsize=(8, 6))
+    sns.scatterplot(data=data, x='Avg Bearer TP DL (kbps)', y='Total DL (Bytes)', alpha=0.6, color='green')
+    plt.title("Throughput (Download) vs. Data Volume")
+    plt.xlabel("Avg Bearer TP DL (kbps)")
+    plt.ylabel("Total Download Volume (Bytes)")
+    plt.grid(True, linestyle='--', alpha=0.7)
+    plt.show()
+
 def main():
     file_path = '../data/Copy of Week2_challenge_data_source(CSV).csv'
 
     data = load_data(file_path)
     clean_data(data)
     correlation_analysis(data)
+    scatter_plots(data)
 
 
 if __name__ == "__main__":
