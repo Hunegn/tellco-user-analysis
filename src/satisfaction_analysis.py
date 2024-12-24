@@ -97,6 +97,34 @@ def build_regression_model(data):
 
     return model
 
+
+def kmeans_clustering(data):
+    """
+    Perform K-means clustering on engagement and experience scores.
+    Args:
+        data (pd.DataFrame): The dataset.
+    Returns:
+        pd.DataFrame: Data with cluster assignments.
+    """
+    
+    features = ['Engagement Score', 'Experience Score']
+    X = data[features].dropna()  
+
+    
+    kmeans = KMeans(n_clusters=2, random_state=42)
+    data.loc[X.index, 'Cluster'] = kmeans.fit_predict(X)
+
+    
+    plt.figure(figsize=(10, 6))
+    plt.scatter(X['Engagement Score'], X['Experience Score'], c=kmeans.labels_, cmap='viridis', alpha=0.7)
+    plt.title("K-Means Clustering (k=2)")
+    plt.xlabel("Engagement Score")
+    plt.ylabel("Experience Score")
+    plt.colorbar(label="Cluster")
+    plt.show()
+
+    return data
+
 def main():
     
     file_path = '../data/Copy of Week2_challenge_data_source(CSV).csv'
@@ -131,6 +159,7 @@ def main():
     data = calculate_satisfaction_score(data)
 
     build_regression_model(data)
+    data = kmeans_clustering(data)
 
    
 
