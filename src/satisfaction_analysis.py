@@ -41,6 +41,23 @@ def calculate_scores(data, engagement_clusters, experience_clusters):
         lambda row: np.linalg.norm(row - experience_clusters[1]), axis=1)
 
     return data
+def calculate_satisfaction_score(data):
+    """
+    Calculate the satisfaction score as the average of engagement and experience scores.
+    Args:
+        data (pd.DataFrame): The dataset.
+    Returns:
+        pd.DataFrame: Data with satisfaction scores.
+    """
+  
+    data['Satisfaction Score'] = (data['Engagement Score'] + data['Experience Score']) / 2
+
+   
+    top_customers = data.nlargest(10, 'Satisfaction Score')[['MSISDN/Number', 'Satisfaction Score']]
+    print("\nTop 10 Satisfied Customers:")
+    print(top_customers)
+
+    return data
 
 
 
@@ -76,7 +93,7 @@ def main():
                             data.groupby('MSISDN/Number')['Total UL (Bytes)'].transform('sum')
    
     data = calculate_scores(data, engagement_clusters, experience_clusters)
-
+    data = calculate_satisfaction_score(data)
 
    
 
