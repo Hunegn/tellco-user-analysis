@@ -124,6 +124,25 @@ def kmeans_clustering(data):
     plt.show()
 
     return data
+def aggregate_cluster_scores(data):
+    """
+    Aggregate the average satisfaction and experience scores per cluster.
+    Args:
+        data (pd.DataFrame): The dataset.
+    """
+    # Ensure Cluster column has no NaN
+    cluster_data = data.dropna(subset=['Cluster', 'Satisfaction Score', 'Experience Score'])
+
+    # Group by cluster and compute averages
+    cluster_summary = cluster_data.groupby('Cluster').agg({
+        'Satisfaction Score': 'mean',
+        'Experience Score': 'mean'
+    })
+
+    print("\nCluster Summary:")
+    print(cluster_summary)
+
+    return cluster_summary
 
 def main():
     
@@ -160,6 +179,7 @@ def main():
 
     build_regression_model(data)
     data = kmeans_clustering(data)
+    cluster_summary = aggregate_cluster_scores(data)
 
    
 
