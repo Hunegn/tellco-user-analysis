@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.impute import SimpleImputer
+from sqlalchemy import create_engine
 
 def calculate_scores(data, engagement_clusters, experience_clusters):
     """
@@ -130,10 +131,10 @@ def aggregate_cluster_scores(data):
     Args:
         data (pd.DataFrame): The dataset.
     """
-    # Ensure Cluster column has no NaN
+    
     cluster_data = data.dropna(subset=['Cluster', 'Satisfaction Score', 'Experience Score'])
 
-    # Group by cluster and compute averages
+   
     cluster_summary = cluster_data.groupby('Cluster').agg({
         'Satisfaction Score': 'mean',
         'Experience Score': 'mean'
@@ -143,6 +144,26 @@ def aggregate_cluster_scores(data):
     print(cluster_summary)
 
     return cluster_summary
+
+
+def export_to_postgres(data, db_url, table_name):
+    """
+    Export data to a PostgreSQL database.
+    Args:
+        data (pd.DataFrame): The dataset.
+        db_url (str): Database connection string.
+        table_name (str): Name of the table.
+    """
+    
+    export_data = data[['MSISDN/Number', 'Engagement Score', 'Experience Score', 'Satisfaction Score', 'Cluster']]
+    export_data = export_data.dropna()  
+
+   
+    engine = create_engine(db_url)
+
+    
+    export_data.to_sql(table_name, con=engine, if_exists='replace', index=False)
+    print(f"\nData exported to PostgreSQL table '{table_name}'")
 
 def main():
     
@@ -180,6 +201,9 @@ def main():
     build_regression_model(data)
     data = kmeans_clustering(data)
     cluster_summary = aggregate_cluster_scores(data)
+    db_url = 'postgresql+psycopg2://hunegna_2:12372342@localhost:5432/telecom_analysis'
+    export_to_postgres(data, db_url, 'satisfaction_analysis')
+
 
    
 
