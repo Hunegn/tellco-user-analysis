@@ -114,8 +114,8 @@ def main():
 
     data = load_data(file_path)
     aggregated_data = aggregate_customer_data(data)
-    analyze_parameters(aggregated_data)
-    analyze_distributions(aggregated_data)
+    # analyze_parameters(aggregated_data)
+    # analyze_distributions(aggregated_data)
     perform_clustering(aggregated_data)
 
 if __name__ == "__main__":
